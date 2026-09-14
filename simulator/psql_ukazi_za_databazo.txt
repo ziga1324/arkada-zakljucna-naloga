@@ -1,0 +1,294 @@
+-- ============================================================
+-- ARCADE PROJECT DATABASE
+-- PostgreSQL
+-- ============================================================
+
+
+-- ============================================================
+-- 1. ARCADE NAPRAVE
+-- ============================================================
+
+CREATE TABLE arcades (
+    arcade_id VARCHAR(15) PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    software_version VARCHAR(20),
+    local_ip INET,
+
+    status VARCHAR(20) DEFAULT 'offline'
+        CHECK (status IN ('online', 'offline', 'maintenance')),
+
+    last_seen TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 2. UPORABNIKI
+-- ============================================================
+
+CREATE TABLE users (
+    user_id BIGSERIAL PRIMARY KEY,
+
+    username VARCHAR(30) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE,
+
+    password_hash TEXT,
+
+    role VARCHAR(20) DEFAULT 'user'
+        CHECK (role IN ('user', 'admin')),
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMPTZ
+);
+
+
+-- ============================================================
+-- 3. IGRE
+-- ============================================================
+
+CREATE TABLE games (
+    game_id BIGSERIAL PRIMARY KEY,
+
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+
+    version VARCHAR(20),
+
+    multiplayer BOOLEAN DEFAULT FALSE,
+    enabled BOOLEAN DEFAULT TRUE,
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 4. REZULTATI
+-- ============================================================
+
+CREATE TABLE scores (
+    score_id BIGSERIAL PRIMARY KEY,
+
+    user_id BIGINT REFERENCES users(user_id)
+        ON DELETE SET NULL,
+
+    arcade_id VARCHAR(15) REFERENCES arcades(arcade_id)
+        ON DELETE SET NULL,
+
+    game_id BIGINT REFERENCES games(game_id)
+        ON DELETE CASCADE,
+
+    score BIGINT NOT NULL,
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 5. IGRALNE SEJE
+-- ============================================================
+
+CREATE TABLE game_sessions (
+    session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    arcade_id VARCHAR(15) REFERENCES arcades(arcade_id)
+        ON DELETE SET NULL,
+
+    game_id BIGINT REFERENCES games(game_id)
+        ON DELETE SET NULL,
+
+    started_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+
+    ended_at TIMESTAMPTZ,
+
+    status VARCHAR(20) DEFAULT 'active'
+        CHECK (status IN ('active', 'finished', 'cancelled'))
+);
+
+
+-- ============================================================
+-- 6. UPORABNIKI V IGRALNI SEJI
+-- ============================================================
+
+CREATE TABLE session_players (
+    session_id UUID REFERENCES game_sessions(session_id)
+        ON DELETE CASCADE,
+
+    user_id BIGINT REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    score BIGINT DEFAULT 0,
+
+    joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (session_id, user_id)
+);
+
+
+-- ============================================================
+-- 7. MULTIPLAYER / POVEZOVANJE VEČ ARKAD
+-- ============================================================
+
+CREATE TABLE multiplayer_rooms (
+    room_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    room_code VARCHAR(10) UNIQUE NOT NULL,
+
+    game_id BIGINT REFERENCES games(game_id)
+        ON DELETE CASCADE,
+
+    status VARCHAR(20) DEFAULT 'waiting'
+        CHECK (
+            status IN (
+                'waiting',
+                'starting',
+                'playing',
+                'finished'
+            )
+        ),
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMPTZ,
+    ended_at TIMESTAMPTZ
+);
+
+
+CREATE TABLE multiplayer_room_arcades (
+    room_id UUID REFERENCES multiplayer_rooms(room_id)
+        ON DELETE CASCADE,
+
+    arcade_id VARCHAR(15) REFERENCES arcades(arcade_id)
+        ON DELETE CASCADE,
+
+    joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (room_id, arcade_id)
+);
+
+
+-- ============================================================
+-- 8. SOFTWARE VERZIJE
+-- ============================================================
+
+CREATE TABLE software_versions (
+    version VARCHAR(20) PRIMARY KEY,
+
+    release_notes TEXT,
+
+    download_url TEXT,
+
+    required BOOLEAN DEFAULT FALSE,
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 9. POSODOBITVE ARKAD
+-- ============================================================
+
+CREATE TABLE arcade_updates (
+    update_id BIGSERIAL PRIMARY KEY,
+
+    arcade_id VARCHAR(15) REFERENCES arcades(arcade_id)
+        ON DELETE CASCADE,
+
+    version VARCHAR(20) REFERENCES software_versions(version)
+        ON DELETE SET NULL,
+
+    status VARCHAR(20) DEFAULT 'pending'
+        CHECK (
+            status IN (
+                'pending',
+                'downloading',
+                'installing',
+                'completed',
+                'failed'
+            )
+        ),
+
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 10. DOGODKI / LOGI ARKADE
+-- ============================================================
+
+CREATE TABLE arcade_logs (
+    log_id BIGSERIAL PRIMARY KEY,
+
+    arcade_id VARCHAR(15) REFERENCES arcades(arcade_id)
+        ON DELETE CASCADE,
+
+    level VARCHAR(20) DEFAULT 'info'
+        CHECK (
+            level IN (
+                'info',
+                'warning',
+                'error',
+                'critical'
+            )
+        ),
+
+    message TEXT NOT NULL,
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 11. TELEMETRIJA ARKADE
+-- ============================================================
+
+CREATE TABLE arcade_telemetry (
+    telemetry_id BIGSERIAL PRIMARY KEY,
+
+    arcade_id VARCHAR(15) REFERENCES arcades(arcade_id)
+        ON DELETE CASCADE,
+
+    cpu_temperature REAL,
+    cpu_usage REAL,
+    ram_usage REAL,
+    disk_usage REAL,
+
+    recorded_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- INDEXI
+-- ============================================================
+
+CREATE INDEX idx_scores_user
+ON scores(user_id);
+
+
+CREATE INDEX idx_scores_game
+ON scores(game_id);
+
+
+CREATE INDEX idx_scores_arcade
+ON scores(arcade_id);
+
+
+CREATE INDEX idx_scores_score
+ON scores(score DESC);
+
+
+CREATE INDEX idx_arcade_last_seen
+ON arcades(last_seen);
+
+
+CREATE INDEX idx_logs_arcade
+ON arcade_logs(arcade_id);
+
+
+CREATE INDEX idx_telemetry_arcade
+ON arcade_telemetry(arcade_id);
+
+
+CREATE INDEX idx_telemetry_time
+ON arcade_telemetry(recorded_at);
