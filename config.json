@@ -1,0 +1,7 @@
+{
+    "arcade_id": "SIM-01",
+    "arcade_name": "Arcade 1",
+    "server_ip": "https://api.sidebit.si",
+    "heartbeat_interval": 30,
+    "simulation_mode": true
+}
