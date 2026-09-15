@@ -453,14 +453,34 @@ class ArcadeSimulator:
         print("Izbran error:", error)
 
         if error == "Network":
+            self.ip = None
+            self.server_connected = False
             print("Simuliram Network error")
-            
 
         elif error == "Controller":
             print("Simuliram Controller error")
 
         elif error == "Temperature":
+            self.temperature = 100
+            self.artificial_cpu_usage = 100
+            self.power_off()
             print("Simuliram Temperature error")
+
+        elif error == "Game":
+            print("Simuliram Game error")
+
+        elif error == "Server":
+            self.server_connected = False
+            
+            print("Simuliram Server error")
+
+        elif error == "Database":
+            print("Simuliram Database error")
+
+        elif error == "Display":
+            print("Simuliram Display error")
+
+        
 
 
 
@@ -548,16 +568,23 @@ class ArcadeSimulator:
             )
 
             return
+        elif (self.temperature > 80) or (self.cpu_usage > 90):
 
-        self.arcade_online = True
+            self.write_log(
+                "ERROR: Cannot power on due to high temperature or CPU usage."
+            )
 
-        self.status_label.config(
-            text="ONLINE"
-        )
+            return
+        else:
+            self.arcade_online = True
 
-        self.write_log(
-            "Arcade powered ON."
-        )
+            self.status_label.config(
+                text="ONLINE"
+            )
+
+            self.write_log(
+                "Arcade powered ON."
+            )
 
     def power_off(self):
 
