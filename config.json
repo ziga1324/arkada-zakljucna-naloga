@@ -1,7 +1,93 @@
-{
-    "arcade_id": "SIM-01",
-    "arcade_name": "Arcade 1",
-    "server_ip": "https://api.sidebit.si",
-    "heartbeat_interval": 30,
-    "simulation_mode": true
-}
+[
+    {
+        "arcade_id": "SIM-01",
+        "arcade_name": "Arcade 1",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-02",
+        "arcade_name": "Arcade 2",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-03",
+        "arcade_name": "Arcade 3",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-04",
+        "arcade_name": "Arcade 4",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-05",
+        "arcade_name": "Arcade 5",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-06",
+        "arcade_name": "Arcade 6",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-07",
+        "arcade_name": "Arcade 7",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-08",
+        "arcade_name": "Arcade 8",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-09",
+        "arcade_name": "Arcade 9",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-10",
+        "arcade_name": "Arcade 10",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-11",
+        "arcade_name": "Arcade 11",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-12",
+        "arcade_name": "Arcade 12",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    },
+    {
+        "arcade_id": "SIM-13",
+        "arcade_name": "Arcade 13",
+        "server_ip": "https://api.sidebit.si",
+        "heartbeat_interval": 30,
+        "simulation_mode": true
+    }
+]

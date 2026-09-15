@@ -350,6 +350,7 @@ class ArcadeSimulator:
             pady=5
         )
 
+        
         ttk.Separator(
             right_frame
         ).pack(
@@ -379,14 +380,39 @@ class ArcadeSimulator:
             right_frame,
             text="SIMULATE ERROR",
             width=25,
-            command=self.simulate_error
+            command=self.simuliraj_error
         ).pack(
             pady=4
         )
 
-        # =====================================
-        # LOG
-        # =====================================
+        tk.Label(
+            right_frame,
+            text="Oznaci error, ki ga hoces simulirat"
+        ).pack()
+
+        self.error_select = ttk.Combobox(
+            right_frame,
+            values=[
+                "Network",
+                "Controller",
+                "Temperature",
+                "Game",
+                "Server",
+                "Database",
+                "Display"
+            ],
+            state="readonly"
+        )
+
+        self.error_select.set(
+            "Network"
+        )
+
+        self.error_select.pack(
+            pady=5
+        )
+
+        ######################################## Naprej je log
 
         log_frame = tk.LabelFrame(
             self.root,
@@ -416,6 +442,27 @@ class ArcadeSimulator:
         self.write_log(
             "Simulator initialized."
         )
+
+
+    ################################# Errorji simuliranje
+
+
+    def simuliraj_error(self):
+        error = self.error_select.get()
+
+        print("Izbran error:", error)
+
+        if error == "Network":
+            print("Simuliram Network error")
+            
+
+        elif error == "Controller":
+            print("Simuliram Controller error")
+
+        elif error == "Temperature":
+            print("Simuliram Temperature error")
+
+
 
     # =============================================
     # LOG
@@ -719,29 +766,6 @@ class ArcadeSimulator:
 
         self.sync_server_state()
 
-    # =============================================
-    # ERROR
-    # =============================================
-
-    def simulate_error(self):
-
-        errors = [
-            "Network connection lost",
-            "Controller disconnected",
-            "High CPU temperature",
-            "Game crashed",
-            "Server timeout",
-            "Database unavailable",
-            "Display signal lost"
-        ]
-
-        error = random.choice(
-            errors
-        )
-
-        self.write_log(
-            f"ERROR: {error}"
-        )
 
     # =============================================
     # LABELS
@@ -795,10 +819,6 @@ class ArcadeSimulator:
                 f"{self.heartbeat_count}"
             )
         )
-
-    # =============================================
-    # SYSTEM SIMULATION
-    # =============================================
 
     def update_system(self):
 
